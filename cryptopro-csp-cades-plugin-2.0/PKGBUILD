@@ -1,0 +1,54 @@
+# Maximalisimus crypto pro cades plugin created
+
+pkgname="cryptopro-csp-cades-plugin"
+pkgver=2.0.14071
+pkgrel=1
+pkgdesc='Crypto pro CS cades browser plugin settings'
+_cplugin_pkgname="cades-plugin-settings"
+_cplugin_name="Cades plugin settings"
+_pkgdesk_ru="Настройка плагина ЭЦП Cades Browser plugin"
+arch=('x86_64')
+url='https://cryptopro.ru/products/cryptopro-csp'
+license=('GPL')
+makedepends=(
+    'libarchive'
+    'gendesk'
+)
+# Direct links to sources download:
+# https://www.cryptopro.ru/sites/default/files/products/cades/current_release_2_0/cades_linux_amd64.tar.gz
+source=(
+    'cades_linux_amd64.tar.gz'
+	'html-icons.tar.gz'
+)
+noextract=('html-icons.tar.gz')
+
+sha512sums=(
+    '82ecc64fd70cee7a8f742577cb77822c5dcc328bade6e941b0e2af9a255fe6262cceef8e61b1afb6a29cf41d3ba0675f8203d47ba2b772f3ce43150963a23444'
+    '2d7f163ff6224df05dcfdae1bc720b87e547ba15c2a2bd8b4165dbd6f1eb5a205c7c3a6690c265cb5f7ec19456541752516405c82dc25e7708052bc6916550e2'
+)
+install=cades-plugin.install
+options=(!strip)
+
+package() {
+	cd "$srcdir/cades_linux_amd64"
+	bsdtar -xf "cprocsp-pki-cades-64-2.0.14071-1.amd64.rpm" -C "$pkgdir"
+    bsdtar -xf "cprocsp-pki-plugin-64-2.0.14071-1.amd64.rpm" -C "$pkgdir"
+    
+    cd "$srcdir"
+    mkdir -p "$pkgdir/usr/share/icons/"
+    bsdtar -xf "html-icons.tar.gz" -C "$pkgdir/usr/share/icons/"
+	
+	gendesk -n --pkgname="$_cplugin_pkgname" --name="$_cplugin_name" --comment="$pkgdesc" \
+		--icon="html-icon" --terminal=false --categories="Settings;GTK" \
+		--custom="URL=file:///etc/opt/cprocsp/trusted_sites.html" --startupnotify=false -f
+
+	echo "Comment[ru]=${_pkgdesk_ru}" >> ${_cplugin_pkgname}.desktop
+
+	sed -i '/Type=/s/Application/Link/' ${_cplugin_pkgname}.desktop
+	sed -i '/Exec=/d' ${_cplugin_pkgname}.desktop && sed -i '/Version=/d' ${_cplugin_pkgname}.desktop
+
+	install -Dm644 "${_cplugin_pkgname}.desktop" "$pkgdir/usr/share/applications/${_cplugin_pkgname}.desktop"
+	chmod +x "$pkgdir/usr/share/applications/${_cplugin_pkgname}.desktop"
+	
+	rm -r "$pkgdir/usr/lib64/"
+}

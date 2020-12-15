@@ -1,0 +1,62 @@
+post_install() {
+	_user=$(whoami)
+	_config_file=".cades_plugin_alias"
+	_user_dir="/home/${_user[*]}"
+	_alias_cplugin="${_user_dir}/${_config_file}"
+	_bashrc="$_user_dir/.bashrc"
+	_fishrc="$_user_dir/.config/fish/config.fish"
+	_zshrc="$_user_dir/.zshrc"
+		
+	echo "# cades-plugin-aliases.sh" > "${_alias_cplugin}"
+	echo "alias cp-ocsputil='/opt/cprocsp/bin/amd64/ocsputil'" >> "${_alias_cplugin}"
+	echo "alias cp-nmcades='/opt/cprocsp/bin/amd64/nmcades'" >> "${_alias_cplugin}"
+	echo "alias cp-tsputil='/opt/cprocsp/bin/amd64/tsputil'" >> "${_alias_cplugin}"
+	
+	_shell_string="source ~/${_config_file}"
+	echo "$_shell_string" >> "${_bashrc}"
+	echo "$_shell_string" >> "${_fishrc}"
+	echo "$_shell_string" >> "${_zshrc}"
+	
+	_how_shell=$(echo "$SHELL" | rev | cut -d '/' -f1 | rev | tr '[:upper:]' '[:lower:]')
+	_shell="${_how_shell[*]}"
+	unset _how_shell
+	_sub_bash="bash"
+	_sub_fish="fish"
+	_sub_zsh="zsh"
+	if [[ "$_shell" == *"$_sub_bash"* ]]; then
+		source "${_bashrc}"
+	elif [[ "$_shell" == *"$_sub_fish"* ]]; then
+		source "${_fishrc}"
+	elif [[ "$_shell" == *"$_sub_zsh"* ]]; then
+		source "${_zshrc}"
+	fi
+	
+}
+post_remove() {
+	_user=$(whoami)
+	_config_file=".cades_plugin_alias"
+	_user_dir="/home/${_user[*]}"
+	_alias_cplugin="${_user_dir}/${_config_file}"
+	_bashrc="$_user_dir/.bashrc"
+	_fishrc="$_user_dir/.config/fish/config.fish"
+	_zshrc="$_user_dir/.zshrc"
+	
+	sed -i '/cades_plugin_alias/d' "${_bashrc}"
+	sed -i '/cades_plugin_alias/d' "${_fishrc}"
+	sed -i '/cades_plugin_alias/d' "${_zshrc}"
+	rm -rf "${_alias_cplugin}"
+	
+	_how_shell=$(echo "$SHELL" | rev | cut -d '/' -f1 | rev | tr '[:upper:]' '[:lower:]')
+	_shell="${_how_shell[*]}"
+	unset _how_shell
+	_sub_bash="bash"
+	_sub_fish="fish"
+	_sub_zsh="zsh"
+	if [[ "$_shell" == *"$_sub_bash"* ]]; then
+		source "${_bashrc}"
+	elif [[ "$_shell" == *"$_sub_fish"* ]]; then
+		source "${_fishrc}"
+	elif [[ "$_shell" == *"$_sub_zsh"* ]]; then
+		source "${_zshrc}"
+	fi
+}
