@@ -1,0 +1,23 @@
+# Chromium GOST
+pkgname=chromium-gost
+pkgver=87.0.4280.66
+pkgrel=0
+pkgdesc="Chromium Browser on msspi GOST algoritmes"
+arch=('x86_64')
+url="https://github.com/deemru/chromium-gost/releases/"
+license=('GPL')
+source=("${pkgname}-${pkgver}-linux-amd64.deb::$url/download/${pkgver}/${pkgname}-${pkgver}-linux-amd64.deb")
+# https://github.com/deemru/chromium-gost/releases/download/87.0.4280.66/chromium-gost-87.0.4280.66-linux-amd64.deb
+
+sha512sums=('SKIP')
+
+package() {
+	cd "${srcdir}"
+	bsdtar -xf "data.tar.xz" -C "$pkgdir"
+	find $pkgdir/opt/${pkgname}/ -type f -iname "${pkgname}" -exec chmod 777 {} \;
+	find $pkgdir/opt/${pkgname}/ -type f -iname "${pkgname}" -exec chmod +x {} \;
+	find $pkgdir/usr/share/applications/ -type f -iname "*.desktop" -exec chmod 777 {} \;
+	find $pkgdir/usr/share/applications/ -type f -iname "*.desktop" -exec chmod +x {} \;
+	find $pkgdir/usr/bin/ -type f -exec chmod 777 {} \;
+	find $pkgdir/usr/bin/ -type f -exec chmod +x {} \;
+}
